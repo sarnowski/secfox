@@ -1,0 +1,6 @@
+# vi
+*.swp
+
+# generated ssh keys
+/id_rsa
+/id_rsa.pub
