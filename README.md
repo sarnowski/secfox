@@ -40,8 +40,8 @@ directory and issue the following command:
 ./secfox.sh
 ```
 
-The first time, this could take some time. Further calls will only take milli-
-seconds.
+The first time, this could take some time. Further calls will only take
+milliseconds.
 
 
 ## Configuration
@@ -84,3 +84,6 @@ user_pref("network.proxy.http", "192.168.1.100");
 user_pref("network.proxy.http_port", 4444);
 user_pref("browser.search.defaultenginename", "I2P Forum");
 ```
+
+Hint: if you are running I2P on your local computer, you can find out the
+correct IP via `ifconfig docker0`. `127.0.0.1` will not work!
