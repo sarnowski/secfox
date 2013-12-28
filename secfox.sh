@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# script dir
+# application dir
 dir=$(dirname $0)
 
 # test if we are root
@@ -12,12 +12,12 @@ reqroot=$?
 
 # require root
 if [ $reqroot -ne 0 ] && [ $isroot -ne 0 ]; then
-	echo "Requiring root; switching to privileged mode..."
+	echo "[secfox] Requiring root; switching to privileged mode..."
 	sudo $0 $(id -un) $*
 	exit $?
 fi
 
-# save user if necessary
+# save user if we switched
 if [ $isroot -eq 0 ]; then
 	user=$1
 	shift
@@ -28,22 +28,28 @@ session="default"
 session_dir=$dir/config
 if [ ! -z "$1" ]; then
 	session=$1
-	session_dir=$session_dir-$session
-	if [ ! -d $session_dir ]; then
-		echo "[secfox] session $session directory $session_dir not found!" >&2
-		exit 1
-	fi
+	session_dir=$dir/config-$session
 fi
 
 echo "[secfox] session $session starting..."
+
 version=$(git describe --tags)
 [ -z "$version" ] && version="unknown"
 
+# create new profile directory
+if [ ! -d $session_dir ]; then
+	echo "[secfox] creating new configuration from examples..."
+	$dir/examples/setup.sh $session_dir
+	if [ $isroot -eq 0 ]; then
+		chown -R $user $session_dir
+	fi
+fi
+
 # have an ssh key?
-key=$dir/id_rsa
+key=$session_dir/id_rsa
 if [ ! -f $key ]; then
 	echo "[secfox] setting up access, enter a password of your choice:"
-	ssh-keygen -q -t rsa -f $dir/id_rsa || exit 1
+	ssh-keygen -q -t rsa -f $key || exit 1
 	if [ $isroot -eq 0 ]; then
 		chown $user $key
 		chown $user ${key}.pub
@@ -57,7 +63,7 @@ if [ -z "$(docker images sarnowski/secfox | grep -E "[ \\t]$version+[ \\t]+")" ]
 	$dir/image/build.sh || exit 1
 fi
 
-# run new container if necessary
+# run new container
 echo "[secfox] starting container $version ..."
 cont=$(docker run -d -p 22 -t sarnowski/secfox:$version "$pubkey")
 if [ -z "$cont" ]; then
@@ -91,16 +97,9 @@ while [ true ]; do
 		exit 1
 	fi
 done
-
 echo "[secfox] ### SSH access via:  ssh -i $dir/id_rsa -p $port secfox@127.0.0.1"
 
 # upload configurations
-if [ ! -d $session_dir ]; then
-	$dir/examples/setup.sh
-	if [ $isroot -eq 0 ]; then
-		chown -R $user config
-	fi
-fi
 echo "[secfox] uploading configurations... [$session_dir]"
 scp -r -q -o StrictHostKeychecking=no -i $key -P $port $session_dir/* secfox@127.0.0.1:.mozilla/firefox/secfox/ || exit 1
 
