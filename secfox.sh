@@ -40,7 +40,7 @@ pubkey=$(cat ${key}.pub)
 # run new container if necessary
 echo "[secfox] starting container..."
 version=$(git describe --tags)
-[ -z "$version"] && version="unknown"
+[ -z "$version" ] && version="unknown"
 cont=$(docker run -d -p 22 -t sarnowski/secfox:$version "$pubkey")
 if [ -z "$cont" ]; then
 	echo "[secfox] couldn't start secfox!" >&2

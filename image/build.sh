@@ -14,7 +14,7 @@ fi
 # basics
 cd $(dirname $0)
 version=$(git describe --tags)
-[ -z "$version"] && version="unknown"
+[ -z "$version" ] && version="unknown"
 echo "Building version: $version"
 
 # build everything
