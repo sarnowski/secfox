@@ -86,4 +86,14 @@ user_pref("browser.search.defaultenginename", "I2P Forum");
 ```
 
 Hint: if you are running I2P on your local computer, you can find out the
-correct IP via `ifconfig docker0`. `127.0.0.1` will not work!
+correct IP via `ifconfig docker0`. `127.0.0.1` will not work! Also make sure
+that your I2P router is configured correctly to accept connections from the
+outside.
+
+### Force using your proxy / I2P
+
+You can execute a bunch of own linux commands on the secfox system via a
+`config/init.sh` script. In order to really lock down your system and prevent
+any malicious calls, you can forbid any kind of connections to the outer world
+except with your proxy. Look at the `examples/init.proxy.sh` file how to set
+up your configuration.

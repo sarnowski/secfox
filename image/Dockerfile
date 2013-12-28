@@ -6,11 +6,14 @@ MAINTAINER "Tobias Sarnowski <tobias@sarnowski.io>"
 # setup packages
 RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
 RUN apt-get update
-RUN apt-get install -y openssh-server firefox
+RUN apt-get install -y openssh-server firefox sudo iptables
 
 # sshd preparations
 RUN mkdir -p /var/run/sshd
 ADD sshd_config /etc/ssh/sshd_config
+
+# sudo preparations
+RUN echo "secfox ALL=NOPASSWD: ALL" >> /etc/sudoers
 
 # populate files
 RUN mkdir -p /secfox
