@@ -56,29 +56,29 @@ if [ ! -z "$(echo $port | grep "HostPort")" ]; then
 	exit 1
 fi
 
-# start firefox!
-echo "[secfox] connecting to container..."
-cmd="ssh -i $key -X -p $port -o StrictHostKeychecking=no secfox@127.0.0.1"
-failed=0
+echo "[secfox] waiting for container to come up..."
 counter=0
 while [ true ]; do
-	if [ $isroot -eq 0 ]; then
-		sudo -u $user $cmd
-		failed=$?
-	else
-		$cmd
-		failed=$?
-	fi
-	[ $failed -eq 0 ] && break
+	ssh -o StrictHostKeychecking=no -i $key -p $port secfox@127.0.0.1 -C echo "[secfox] connected"
+	[ $? -eq 0 ] && break
 
 	counter=$(($counter + 1))
-	[ $counter -gt 5 ] && break
-	sleep 1
+	if [ $counter -gt 5 ]; then
+		echo "[secfox] failed to connect to container!"
+		docker logs $cont | tail -n 20
+		docker kill $cont >/dev/null
+		docker rm $cont >/dev/null
+		exit 1
+	fi
 done
-if [ $failed -ne 0 ]; then
-	echo "[secfox] failed to connect to container:"
-	docker logs $cont | tail -n 20
+
+if [ -f $dir/user.js ]; then
+	echo "[secfox] uploading user preferences..."
+	scp -o StrictHostKeychecking=no -i $key -P $port $dir/user.js secfox@127.0.0.1: || exit 1
 fi
+
+echo "[secfox] starting firefox..."
+ssh -o StrictHostKeychecking=no -i $key -p $port -X secfox@127.0.0.1 -C /secfox/firefox.sh || exit 1
 
 # kill container
 echo "[secfox] killing container..."

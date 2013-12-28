@@ -14,13 +14,10 @@ keyfile=/secfox/home/.ssh/authorized_keys
 mkdir -p $(dirname $keyfile)
 chmod 0700 $(dirname $keyfile)
 
-echo "command=\"/secfox/firefox.sh\" $key" > $keyfile
+echo $key > $keyfile
 chmod 0400 $keyfile
 
 chown -R secfox $(dirname $keyfile)
-
-echo "[secfox] authorized informations:"
-cat $keyfile
 
 # run sshd
 echo "[secfox] starting SSH daemon..."
