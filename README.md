@@ -47,16 +47,16 @@ milliseconds.
 ## Configuration
 
 After the first start, you have a `config` directory. Its content will be used
-to set up your firefox profile. By default, it has a minimal setup.
+to set up your firefox profile and system. By default, it has a minimal setup.
 
 ### Examples
 
 There are some examples provided in the `examples` directory. You can e.g. add
 some privacy options to your secfox by adding the content of the
-`user.privacy.js` file to your `config/user.js` file:
+`firefox/user.privacy.js` file to your `config/firefox/user.js` file:
 
 ```Shell
-cat examples/user.privacy.js >> config/user.js
+cat examples/firefox/user.privacy.js >> config/firefox/user.js
 ```
 
 ### Recommended I2P setup
@@ -64,13 +64,13 @@ cat examples/user.privacy.js >> config/user.js
 In order to use secfox with I2P it is recommended to do the following steps:
 
 ```Shell
-cat examples/user.defaults.js \
-    examples/user.privacy.js \
-    examples/user.proxy.js \
-    > config/user.js
+cat examples/firefox/user.defaults.js \
+    examples/firefox/user.privacy.js \
+    examples/firefox/user.proxy.js \
+    > config/firefox/user.js
 ```
 
-Then open your `config/user.js` and change the following settings:
+Then open your `config/firefox/user.js` and change the following settings:
 
 * `network.proxy.http` = [your I2P router IP]
 * `network.proxy.http_port` = [your I2P router port, usually 4444]
@@ -90,13 +90,28 @@ correct IP via `ifconfig docker0`. `127.0.0.1` will not work! Also make sure
 that your I2P router is configured correctly to accept connections from the
 outside.
 
-### Force using your proxy / I2P
+### init.sh: force using your proxy / I2P
 
 You can execute a bunch of own linux commands on the secfox system via a
 `config/init.sh` script. In order to really lock down your system and prevent
 any malicious calls, you can forbid any kind of connections to the outer world
 except with your proxy. Look at the `examples/init.proxy.sh` file how to set
 up your configuration.
+
+### setup.sh / teardown.sh: customize your system
+
+Before running firefox and after it ran, the `config/setup.sh` and
+`config/teardown.sh` will be executed. One use case is to get the downloads
+from the firefox to your local computer. Look at
+`examples/teardown.downloads.sh` as an example.
+
+The following environment variables are available:
+* `SECFOX_USER` the firefox user name
+* `SECFOX_HOST` the ssh hostname
+* `SECFOX_PORT` the ssh port
+* `SECFOX_SSH_ARGS` some arguments you should pass to your ssh calls
+* `SECFOX_MOZ_DIR` where the firefox profile is stored remotely
+* `SECFOX_CONFIG_DIR` your local configuration directory
 
 ## Multiple configurations
 

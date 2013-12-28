@@ -81,11 +81,20 @@ if [ ! -z "$(echo $port | grep "HostPort")" ]; then
 	exit 1
 fi
 
+# populate environment variables
+export SECFOX_USER="secfox"
+export SECFOX_HOST="127.0.0.1"
+export SECFOX_PORT=$port
+export SECFOX_SSH_ARGS="-o StrictHostKeychecking=no -i $key"
+export SECFOX_MOZ_DIR="/secfox/home/.mozilla/firefox/secfox/"
+export SECFOX_CONFIG_DIR=$session_dir
+echo "[secfox] ### SSH access via:  ssh $SECFOX_SSH_ARGS -p $SECFOX_PORT $SECFOX_USER@$SECFOX_HOST"
+
 # wait until sshd started
 echo "[secfox] waiting for container to come up..."
 counter=0
 while [ true ]; do
-	ssh -q -o StrictHostKeychecking=no -i $key -p $port secfox@127.0.0.1 -C echo "[secfox] connected" 2>/dev/null
+	ssh -q $SECFOX_SSH_ARGS -p $SECFOX_PORT $SECFOX_USER@$SECFOX_HOST -C echo "[secfox] connected" 2>/dev/null
 	[ $? -eq 0 ] && break
 
 	counter=$(($counter + 1))
@@ -97,15 +106,33 @@ while [ true ]; do
 		exit 1
 	fi
 done
-echo "[secfox] ### SSH access via:  ssh -i $dir/id_rsa -p $port secfox@127.0.0.1"
 
 # upload configurations
-echo "[secfox] uploading configurations... [$session_dir]"
-scp -r -q -o StrictHostKeychecking=no -i $key -P $port $session_dir/* secfox@127.0.0.1:.mozilla/firefox/secfox/ || exit 1
+echo "[secfox] uploading firefox configuration..."
+scp -r -q $SECFOX_SSH_ARGS -P $SECFOX_PORT $session_dir/firefox/* $SECFOX_USER@$SECFOX_HOST:$SECFOX_MOZ_DIR || exit 1
+
+# remote init.sh
+if [ -f $session_dir/init.sh ]; then
+	echo "[secfox] executing remote initilization script..."
+	scp -q $SECFOX_SSH_ARGS -P $SECFOX_PORT $session_dir/init.sh $SECFOX_USER@$SECFOX_HOST: || exit 1
+	ssh -q $SECFOX_SSH_ARGS -p $SECFOX_PORT $SECFOX_USER@$SECFOX_HOST -C sh /secfox/home/init.sh || exit 1
+fi
+
+# local setup.sh
+if [ -f $session_dir/setup.sh ]; then
+	echo "[secfox] executing setup script..."
+	sh $session_dir/setup.sh || exit 1
+fi
 
 # now do it!
 echo "[secfox] starting firefox..."
-ssh -q -o StrictHostKeychecking=no -i $key -p $port -X secfox@127.0.0.1 -C /secfox/firefox.sh || exit 1
+ssh -q -X $SECFOX_SSH_ARGS -p $SECFOX_PORT $SECFOX_USER@$SECFOX_HOST -C /secfox/firefox.sh || exit 1
+
+# local teardown scripts
+if [ -f $session_dir/teardown.sh ]; then
+	echo "[secfox] executing teardown script..."
+	sh $session_dir/teardown.sh
+fi
 
 # kill container
 echo "[secfox] killing container..."

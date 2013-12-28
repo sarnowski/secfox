@@ -11,8 +11,8 @@ dir=$1
 cd $(dirname $0)/..
 
 # create structure
-mkdir -p $dir
+mkdir -p $dir/firefox
 
 # copy over stuff
-cp examples/user.defaults.js $dir/user.js
-cp -r examples/searchplugins $dir
+cp examples/firefox/user.defaults.js $dir/firefox/user.js
+cp -r examples/searchplugins $dir/firefox
