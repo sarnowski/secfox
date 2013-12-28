@@ -36,7 +36,9 @@ use VirtualBox to run Ubuntu Linux.
 Clone this git repository to your local machine. Afterwards, go into the
 directory and issue the following command:
 
-  ./secfox.sh
+```Shell
+./secfox.sh
+```
 
 The first time, this could take some time. Further calls will only take milli-
 seconds.
@@ -53,26 +55,32 @@ There are some examples provided in the `examples` directory. You can e.g. add
 some privacy options to your secfox by adding the content of the
 `user.privacy.js` file to your `config/user.js` file:
 
-  cat examples/user.privacy.js >> config/user.js
+```Shell
+cat examples/user.privacy.js >> config/user.js
+```
 
 ### Recommended I2P setup
 
 In order to use secfox with I2P it is recommended to do the following steps:
 
-  cat examples/user.defaults.js \
-      examples/user.privacy.js \
-      examples/user.proxy.js \
-      > config/user.js
+```Shell
+cat examples/user.defaults.js \
+    examples/user.privacy.js \
+    examples/user.proxy.js \
+    > config/user.js
+```
 
 Then open your `config/user.js` and change the following settings:
 
-* network.proxy.http = [your I2P router IP]
-* network.proxy.http_port = [your I2P router port, usually 4444]
-* browser.search.defaultenginename = "I2P Forum"
+* `network.proxy.http` = [your I2P router IP]
+* `network.proxy.http_port` = [your I2P router port, usually 4444]
+* `browser.search.defaultenginename` = "I2P Forum"
 
 E.g. if you are using a Raspberry PI for your I2P router with the imaginary
 IP `192.168.1.100`, the lines should look like:
 
-  user_pref("network.proxy.http", "192.168.1.100");
-  user_pref("network.proxy.http_port", 4444);
-  user_pref("browser.search.defaultenginename", "I2P Forum");
+```JavaScript
+user_pref("network.proxy.http", "192.168.1.100");
+user_pref("network.proxy.http_port", 4444);
+user_pref("browser.search.defaultenginename", "I2P Forum");
+```
