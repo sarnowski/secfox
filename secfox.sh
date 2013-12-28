@@ -39,7 +39,7 @@ version=$(git describe --tags)
 # create new profile directory
 if [ ! -d $session_dir ]; then
 	echo "[secfox] creating new configuration from examples..."
-	$dir/examples/setup.sh $session_dir
+	$dir/examples/create.sh $session_dir
 	if [ $isroot -eq 0 ]; then
 		chown -R $user $session_dir
 	fi

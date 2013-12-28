@@ -15,4 +15,4 @@ mkdir -p $dir/firefox
 
 # copy over stuff
 cp examples/firefox/user.defaults.js $dir/firefox/user.js
-cp -r examples/searchplugins $dir/firefox
+cp -r examples/firefox/searchplugins $dir/firefox
