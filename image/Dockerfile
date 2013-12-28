@@ -22,6 +22,11 @@ RUN chmod +x /secfox/*.sh
 # setup user
 RUN useradd -d /secfox/home -m secfox
 
+# setup firefox
+RUN mkdir -p /secfox/home/.mozilla/firefox/secfox
+ADD profiles.ini /secfox/home/.mozilla/firefox/profiles.ini
+RUN chown -R secfox /secfox/home/.mozilla
+
 # make SSH accessible
 EXPOSE 22
 

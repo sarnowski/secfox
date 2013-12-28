@@ -1,0 +1,9 @@
+<SearchPlugin xmlns="http://www.mozilla.org/2006/browser/search/">
+	<ShortName>DuckDuckGo</ShortName>
+	<Description>Search Duck Duck Go (SSL)</Description>
+	<InputEncoding>UTF-8</InputEncoding>
+	<Url type="text/html" method="GET" template="https://duckduckgo.com/html/">
+		<Param name="q" value="{searchTerms}"/>
+	</Url>
+	<SearchForm>https://duckduckgo.com/html/</SearchForm>
+</SearchPlugin>

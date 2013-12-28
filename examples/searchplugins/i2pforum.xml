@@ -1,0 +1,10 @@
+<SearchPlugin xmlns="http://www.mozilla.org/2006/browser/search/">
+	<ShortName>I2P Forum</ShortName>
+	<Description>Search I2P forums</Description>
+	<InputEncoding>UTF-8</InputEncoding>
+	<Url type="text/html" method="GET" template="http://forum.i2p/search.php">
+		<Param name="mode" value="results"/>
+		<Param name="search_keywords" value="{searchTerms}"/>
+	</Url>
+	<SearchForm>http://forum.i2p/search.php</SearchForm>
+</SearchPlugin>
