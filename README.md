@@ -97,3 +97,12 @@ You can execute a bunch of own linux commands on the secfox system via a
 any malicious calls, you can forbid any kind of connections to the outer world
 except with your proxy. Look at the `examples/init.proxy.sh` file how to set
 up your configuration.
+
+## Multiple configurations
+
+By default, secfox uses the `config` directory. You can provide different
+configurations by providing `config-MyOtherSetup` directories:
+
+```Shell
+./secfox.sh MyOtherSetup
+```

@@ -23,7 +23,19 @@ if [ $isroot -eq 0 ]; then
 	shift
 fi
 
-echo "[secfox] session starting..."
+# choose session
+session="default"
+session_dir=$dir/config
+if [ ! -z "$1" ]; then
+	session=$1
+	session_dir=$session_dir-$session
+	if [ ! -d $session_dir ]; then
+		echo "[secfox] session $session directory $session_dir not found!" >&2
+		exit 1
+	fi
+fi
+
+echo "[secfox] session $session starting..."
 version=$(git describe --tags)
 [ -z "$version" ] && version="unknown"
 
@@ -83,14 +95,14 @@ done
 echo "[secfox] ### SSH access via:  ssh -i $dir/id_rsa -p $port secfox@127.0.0.1"
 
 # upload configurations
-if [ ! -d $dir/config ]; then
+if [ ! -d $session_dir ]; then
 	$dir/examples/setup.sh
 	if [ $isroot -eq 0 ]; then
 		chown -R $user config
 	fi
 fi
-echo "[secfox] uploading configurations..."
-scp -r -q -o StrictHostKeychecking=no -i $key -P $port $dir/config/* secfox@127.0.0.1:.mozilla/firefox/secfox/ || exit 1
+echo "[secfox] uploading configurations... [$session_dir]"
+scp -r -q -o StrictHostKeychecking=no -i $key -P $port $session_dir/* secfox@127.0.0.1:.mozilla/firefox/secfox/ || exit 1
 
 # now do it!
 echo "[secfox] starting firefox..."

@@ -22,7 +22,6 @@ user_pref("signon.prefillForms", false);
 
 // set up duckduckgo as search engine
 user_pref("browser.search.defaultenginename", "DuckDuckGo");
-user_pref("browser.search.order.1", "DuckDuckGo");
 
 // no google lookups
 user_pref("browser.safebrowsing.enabled", false);
