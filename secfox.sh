@@ -6,8 +6,13 @@ dir=$(dirname $0)
 # test if we are root
 isroot=$(id -u)
 
+# test for the docker binary, ubuntu ships with "docker.io"
+DOCKER=docker
+which docker.io 2>&1 >/dev/null
+[ $? -eq 0 ] && DOCKER=docker.io
+
 # test if we require root
-docker ps >/dev/null 2>/dev/null
+$DOCKER ps >/dev/null 2>/dev/null
 reqroot=$?
 
 # require root
@@ -58,14 +63,14 @@ fi
 pubkey=$(cat ${key}.pub)
 
 # image available? if not, build
-if [ -z "$(docker images sarnowski/secfox | grep -E "[ \\t]$version+[ \\t]+")" ]; then
+if [ -z "$($DOCKER images sarnowski/secfox | grep -E "[ \\t]$version+[ \\t]+")" ]; then
 	echo "[secfox] building container $version ..."
 	$dir/image/build.sh || exit 1
 fi
 
 # run new container
 echo "[secfox] starting container $version ..."
-cont=$(docker run -d -p 22 -t sarnowski/secfox:$version "$pubkey")
+cont=$($DOCKER run -d -p 22 -t sarnowski/secfox:$version "$pubkey")
 if [ -z "$cont" ]; then
 	echo "[secfox] couldn't start secfox!" >&2
 	exit 1
@@ -73,11 +78,11 @@ fi
 
 # read the generated local port
 echo "[secfox] searching port..."
-port=$(docker inspect $cont | grep "HostPort" | head -n 1 | sed -E 's/.*"HostPort": "(.+)".*/\1/')
+port=$($DOCKER inspect $cont | grep "HostPort" | head -n 1 | sed -E 's/.*"HostPort": "(.+)".*/\1/')
 if [ ! -z "$(echo $port | grep "HostPort")" ]; then
 	echo "[secfox] couldn't find port of secfox!" >&2
-	docker kill $cont >/dev/null
-	docker rm $cont >/dev/null
+	$DOCKER kill $cont >/dev/null
+	$DOCKER rm $cont >/dev/null
 	exit 1
 fi
 
@@ -100,9 +105,9 @@ while [ true ]; do
 	counter=$(($counter + 1))
 	if [ $counter -gt 5 ]; then
 		echo "[secfox] failed to connect to container!"
-		docker logs $cont | tail -n 20
-		docker kill $cont >/dev/null
-		docker rm $cont >/dev/null
+		$DOCKER logs $cont | tail -n 20
+		$DOCKER kill $cont >/dev/null
+		$DOCKER rm $cont >/dev/null
 		exit 1
 	fi
 done
@@ -136,7 +141,7 @@ fi
 
 # kill container
 echo "[secfox] killing container..."
-docker kill $cont >/dev/null
-docker rm $cont >/dev/null
+$DOCKER kill $cont >/dev/null
+$DOCKER rm $cont >/dev/null
 
 echo "[secfox] session closed."
