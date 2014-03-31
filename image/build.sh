@@ -1,7 +1,12 @@
 #!/bin/sh
 
+# test for the docker binary, ubuntu ships with "docker.io"
+DOCKER=docker
+which docker.io 2>&1 >/dev/null
+[ $? -eq 0 ] && DOCKER=docker.io
+
 # test if we require root
-docker ps >/dev/null 2>/dev/null
+$DOCKER ps >/dev/null 2>/dev/null
 reqroot=$?
 
 # switch to root if necessary
@@ -18,4 +23,4 @@ version=$(git describe --tags)
 echo "Building version: $version"
 
 # build everything
-docker build -rm=true -t="sarnowski/secfox:$version" .
+$DOCKER build -rm=true -t="sarnowski/secfox:$version" .
